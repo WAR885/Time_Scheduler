@@ -1,10 +1,11 @@
 from tkinter import *
 from datetime import *
 from tkinter import ttk
+from ScheduleTimes import *
 
 class ScheduleInterface:
-    WEEKDAYS = ('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')
-    timePanels = ()
+    WEEKDAYS = ('Mon','Tues','Wed','Thur','Fri','Sat','Sun')
+    timePanels = list()
 
     def __init__(self,screen: Frame):
 
@@ -42,11 +43,11 @@ class ScheduleInterface:
         self.scheduleFrame.grid_columnconfigure(1,weight=1)
         self.scheduleFrame.grid_rowconfigure(0,weight=1)
 
-        self.currDate = date.today()
+        self.weekSchedule = ScheduleTimes()
 
         
         for i in range(7):
-            label = Label(self.scheduleGrid,text=self.WEEKDAYS[i],padx=5,font=("Courier",15),borderwidth=1,relief="solid")
+            label = Label(self.scheduleGrid,text=f"{self.WEEKDAYS[i]}, {self.weekSchedule.weekDays[i].strftime("%m/%d")}",padx=5,font=("Courier",10),borderwidth=1,relief="solid")
             self.scheduleGrid.columnconfigure(i+1,weight=1)
             self.containerCanvas.columnconfigure(i+1,weight=1)
             label.grid(row=0,column=i+1,sticky="nsew")
@@ -67,8 +68,15 @@ class ScheduleInterface:
         j = 0
         for i in range(7):
             for j in range(24):
-                self.timePanels.add(Label(self.scheduleGrid,borderwidth=1,relief="solid"))
+                self.timePanels.append(Label(self.scheduleGrid,borderwidth=1,relief="solid"))
                 self.timePanels[len(self.timePanels)-1].grid(row=j+1,column=i+1,sticky="nsew")
+        self.__updatePanelHighlights()
         
     def __resizeCanvasWidth(self, event):
-            self.containerCanvas.itemconfig(self.windowId,width = event.width)
+        self.containerCanvas.itemconfig(self.windowId,width = event.width)
+
+    def __updatePanelHighlights(self):
+        panels = self.timePanels
+        currDay = self.weekSchedule.currDayOfWeek
+        currTime = self.weekSchedule.currTime
+        panels[(currDay)*24+currTime].configure(bg="gray")
